@@ -1,14 +1,11 @@
 import mongoose from "mongoose";
 
-const roundSchema = new mongoose.Schema(
-  {
-    name: { type: String },
-    status: { type: String, default: "Pending" },
-    date: { type: Date },
-    notes: { type: String },
-  },
-  { _id: false }
-);
+const roundSchema = new mongoose.Schema({
+  name: { type: String },
+  status: { type: String, default: "Pending" },
+  date: { type: Date },
+  notes: { type: String },
+});
 
 const documentSchema = new mongoose.Schema(
   {
@@ -20,6 +17,7 @@ const documentSchema = new mongoose.Schema(
 
 const applicationSchema = new mongoose.Schema(
   {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     companyName: { type: String, required: true },
     role: { type: String, required: true },
     status: { type: String, default: "Applied" },

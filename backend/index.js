@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import applicationRoutes from "./routes/applicationRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import requireAuth from "./middleware/requireAuth.js";
 
 dotenv.config();
 
@@ -19,7 +21,8 @@ app.get("/", (req, res) => {
   res.send("CareerBoard API running");
 });
 
-app.use("/applications", applicationRoutes);
+app.use("/auth", authRoutes);
+app.use("/applications", requireAuth, applicationRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
