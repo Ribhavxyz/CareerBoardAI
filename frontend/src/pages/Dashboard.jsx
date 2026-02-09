@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { getApplications } from "../services/api.js";
+import { Link, useNavigate } from "react-router-dom";
+import { clearAuth, getApplications } from "../services/api.js";
 
 const formatDate = (value) => {
   if (!value) return "—";
@@ -38,6 +38,7 @@ function Dashboard() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     let isMounted = true;
@@ -84,6 +85,11 @@ function Dashboard() {
     return { total, interviews, offers };
   }, [applications]);
 
+  const handleLogout = () => {
+    clearAuth();
+    navigate("/login");
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
@@ -97,12 +103,21 @@ function Dashboard() {
               <h1 className="text-xl font-semibold">Dashboard</h1>
             </div>
           </div>
-          <Link
-            to="/add"
-            className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400"
-          >
-            + New Application
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-slate-500"
+            >
+              Logout
+            </button>
+            <Link
+              to="/add"
+              className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400"
+            >
+              + New Application
+            </Link>
+          </div>
         </div>
       </header>
 
