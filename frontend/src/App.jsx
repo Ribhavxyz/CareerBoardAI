@@ -4,6 +4,7 @@ import AddApplication from "./pages/AddApplication.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import ApplicationDetails from "./pages/ApplicationDetails.jsx";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/add" element={<AddApplication />} />
+        <Route path="/applications/:id" element={<ApplicationDetails />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

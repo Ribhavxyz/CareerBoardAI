@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { clearAuth, getApplications } from "../services/api.js";
+import { clearAuth, getApplications, updateApplicationStatus } from "../services/api.js";
+
+const STATUS_OPTIONS = ["Applied", "In Process", "Offered", "Rejected"];
 
 const formatDate = (value) => {
   if (!value) return "—";
@@ -38,6 +40,7 @@ function Dashboard() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [statusUpdating, setStatusUpdating] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -88,6 +91,30 @@ function Dashboard() {
   const handleLogout = () => {
     clearAuth();
     navigate("/login");
+  };
+
+  const handleStatusChange = async (applicationId, nextStatus) => {
+    setStatusUpdating((prev) => ({ ...prev, [applicationId]: true }));
+
+    try {
+      const response = await updateApplicationStatus(applicationId, nextStatus);
+      const updated = response.data;
+      setApplications((prev) =>
+        prev.map((item) => (item._id === applicationId ? updated : item))
+      );
+    } catch (err) {
+      console.error("Failed to update status", err);
+    } finally {
+      setStatusUpdating((prev) => {
+        const next = { ...prev };
+        delete next[applicationId];
+        return next;
+      });
+    }
+  };
+
+  const handleRowClick = (applicationId) => {
+    navigate(`/applications/${applicationId}`);
   };
 
   return (
@@ -193,26 +220,44 @@ function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
-                  {applications.map((app) => (
-                    <tr
-                      key={app._id || `${app.companyName}-${app.role}`}
-                      className="transition hover:bg-slate-900/60"
-                    >
-                      <td className="px-6 py-4 font-semibold text-slate-100">{app.companyName}</td>
-                      <td className="px-6 py-4 text-slate-200">{app.role}</td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusBadge(
-                            app.status
-                          )}`}
-                        >
-                          {app.status || "Applied"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-slate-300">{getStage(app.rounds)}</td>
-                      <td className="px-6 py-4 text-slate-300">{formatDate(app.createdAt)}</td>
-                    </tr>
-                  ))}
+                  {applications.map((app) => {
+                    const isUpdating = Boolean(statusUpdating[app._id]);
+                    return (
+                      <tr
+                        key={app._id || `${app.companyName}-${app.role}`}
+                        onClick={() => handleRowClick(app._id)}
+                        className="cursor-pointer transition hover:bg-slate-900/60"
+                      >
+                        <td className="px-6 py-4 font-semibold text-slate-100">{app.companyName}</td>
+                        <td className="px-6 py-4 text-slate-200">{app.role}</td>
+                        <td className="px-6 py-4" onClick={(event) => event.stopPropagation()}>
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={app.status || "Applied"}
+                              disabled={isUpdating}
+                              onChange={(event) =>
+                                handleStatusChange(app._id, event.target.value)
+                              }
+                              className={`rounded-full border px-3 py-1 text-xs font-semibold ${getStatusBadge(
+                                app.status
+                              )} bg-transparent`}
+                            >
+                              {STATUS_OPTIONS.map((option) => (
+                                <option key={option} value={option} className="text-slate-900">
+                                  {option}
+                                </option>
+                              ))}
+                            </select>
+                            {isUpdating && (
+                              <span className="text-xs text-slate-400">Saving...</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-slate-300">{getStage(app.rounds)}</td>
+                        <td className="px-6 py-4 text-slate-300">{formatDate(app.createdAt)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

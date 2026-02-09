@@ -9,19 +9,25 @@ import {
   updateRoundStatus,
   addRound,
   deleteRound,
+  addAttachment,
+  deleteAttachment,
 } from "../controllers/applicationController.js";
+import upload from "../middleware/upload.js";
 
 const router = Router();
 
-router.post("/applications", createApplication);
-router.get("/applications", getApplications);
-router.get("/applications/:id", getApplicationById);
-router.put("/applications/:id", updateApplication);
-router.delete("/applications/:id", deleteApplication);
+router.post("/", createApplication);
+router.get("/", getApplications);
+router.get("/:id", getApplicationById);
+router.put("/:id", updateApplication);
+router.delete("/:id", deleteApplication);
 
-router.patch("/applications/:id/status", updateApplicationStatus);
-router.patch("/applications/:id/rounds/:roundId", updateRoundStatus);
-router.post("/applications/:id/rounds", addRound);
-router.delete("/applications/:id/rounds/:roundId", deleteRound);
+router.patch("/:id/status", updateApplicationStatus);
+router.patch("/:id/rounds/:roundId", updateRoundStatus);
+router.post("/:id/rounds", addRound);
+router.delete("/:id/rounds/:roundId", deleteRound);
+
+router.post("/:id/attachments", upload.single("file"), addAttachment);
+router.delete("/:id/attachments/:attachmentId", deleteAttachment);
 
 export default router;

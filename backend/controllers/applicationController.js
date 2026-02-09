@@ -10,6 +10,7 @@ const defaultRounds = [
 
 const STATUS_OPTIONS = ["Applied", "In Process", "Offered", "Rejected"];
 const ROUND_STATUS_OPTIONS = ["Pending", "Passed", "Failed"];
+const ATTACHMENT_TYPES = ["resume", "jd"];
 
 export const createApplication = async (req, res) => {
   try {
@@ -226,6 +227,73 @@ export const deleteRound = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       message: "Failed to delete round",
+      error: err.message,
+    });
+  }
+};
+
+export const addAttachment = async (req, res) => {
+  try {
+    const { type } = req.body || {};
+    if (!type || !ATTACHMENT_TYPES.includes(type)) {
+      return res.status(400).json({ message: "Invalid attachment type" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: "File is required" });
+    }
+
+    const application = await Application.findById(req.params.id);
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    if (application.userId.toString() !== req.user?.userId) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const attachment = {
+      type,
+      filename: req.file.filename,
+      url: `/uploads/${req.file.filename}`,
+      uploadedAt: new Date(),
+    };
+
+    application.attachments.push(attachment);
+    await application.save();
+
+    return res.status(201).json(application);
+  } catch (err) {
+    return res.status(500).json({
+      message: "Failed to upload attachment",
+      error: err.message,
+    });
+  }
+};
+
+export const deleteAttachment = async (req, res) => {
+  try {
+    const application = await Application.findById(req.params.id);
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    if (application.userId.toString() !== req.user?.userId) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const attachment = application.attachments.id(req.params.attachmentId);
+    if (!attachment) {
+      return res.status(404).json({ message: "Attachment not found" });
+    }
+
+    attachment.deleteOne();
+    await application.save();
+
+    return res.json(application);
+  } catch (err) {
+    return res.status(500).json({
+      message: "Failed to delete attachment",
       error: err.message,
     });
   }

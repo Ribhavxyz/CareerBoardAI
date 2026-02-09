@@ -57,6 +57,25 @@ const getApplications = () => api.get("/applications");
 const createApplication = (data) => api.post("/applications", data);
 const updateApplication = (id, data) => api.put(`/applications/${id}`, data);
 const deleteApplication = (id) => api.delete(`/applications/${id}`);
+const updateApplicationStatus = (id, status) => api.patch(`/applications/${id}/status`, { status });
+const updateRoundStatus = (applicationId, roundId, status) =>
+  api.patch(`/applications/${applicationId}/rounds/${roundId}`, { status });
+const addRound = (applicationId, name) =>
+  api.post(`/applications/${applicationId}/rounds`, { name });
+const deleteRound = (applicationId, roundId) =>
+  api.delete(`/applications/${applicationId}/rounds/${roundId}`);
+
+const uploadAttachment = (applicationId, type, file) => {
+  const formData = new FormData();
+  formData.append("type", type);
+  formData.append("file", file);
+  return api.post(`/applications/${applicationId}/attachments`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+const deleteAttachment = (applicationId, attachmentId) =>
+  api.delete(`/applications/${applicationId}/attachments/${attachmentId}`);
 
 const registerUser = (data) => api.post("/auth/register", data);
 const loginUser = (data) => api.post("/auth/login", data);
@@ -66,6 +85,12 @@ export {
   createApplication,
   updateApplication,
   deleteApplication,
+  updateApplicationStatus,
+  updateRoundStatus,
+  addRound,
+  deleteRound,
+  uploadAttachment,
+  deleteAttachment,
   registerUser,
   loginUser,
   getAuthToken,

@@ -15,6 +15,16 @@ const documentSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const attachmentSchema = new mongoose.Schema(
+  {
+    type: { type: String, enum: ["resume", "jd"], required: true },
+    filename: { type: String, required: true },
+    url: { type: String, required: true },
+    uploadedAt: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
+
 const applicationSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -24,6 +34,7 @@ const applicationSchema = new mongoose.Schema(
     rounds: { type: [roundSchema], default: [] },
     notes: { type: String },
     documents: { type: [documentSchema], default: [] },
+    attachments: { type: [attachmentSchema], default: [] },
   },
   { timestamps: true }
 );
