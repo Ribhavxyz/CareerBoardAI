@@ -9,7 +9,6 @@ import {
 
 const router = Router();
 
-// Base path will be /applications
 router.post("/", createApplication);
 router.get("/", getApplications);
 router.get("/:id", getApplicationById);

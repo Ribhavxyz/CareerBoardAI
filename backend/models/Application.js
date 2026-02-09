@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const roundSchema = new mongoose.Schema(
   {
@@ -30,4 +30,6 @@ const applicationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Application", applicationSchema);
+const Application = mongoose.model("Application", applicationSchema);
+
+export default Application;
