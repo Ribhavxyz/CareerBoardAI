@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+import applicationRoutes from "./routes/applicationRoutes.js";
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ mongoose
 app.get("/", (req, res) => {
   res.send("CareerBoard API running");
 });
+
+app.use("/applications", applicationRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
