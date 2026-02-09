@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const roundSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String },
     status: { type: String, default: "Pending" },
     date: { type: Date },
     notes: { type: String },
@@ -12,8 +12,8 @@ const roundSchema = new mongoose.Schema(
 
 const documentSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    url: { type: String, required: true },
+    name: { type: String },
+    url: { type: String },
   },
   { _id: false }
 );
@@ -30,4 +30,4 @@ const applicationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Application", applicationSchema);
+module.exports = mongoose.model("Application", applicationSchema);
